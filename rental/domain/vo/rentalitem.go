@@ -2,21 +2,26 @@ package vo
 
 import (
 	"time"
-)	
+)
+
 type RentalItem struct {
-	item Item
-	rentalDate time.Time
-	returnDate time.Time
-	overdued bool
+	Item Item
+	RentalDate time.Time
+	ReturnDate time.Time
+	Overdued bool
 }
 
 func CreateRentalItem(item Item) RentalItem {
 	rentalDays:= 14
 
 	return RentalItem{
-		item: item,
-		rentalDate: time.Now(),
-		returnDate: time.Time{}.AddDate(0, 0, rentalDays),
-		overdued: false,
+		Item: item,
+		RentalDate: time.Now(),
+		ReturnDate: time.Time{}.AddDate(0, 0, rentalDays),
+		Overdued: false,
 	}
+}
+
+func (r *RentalItem) GetReturnDate() time.Time {
+	return r.ReturnDate
 }
