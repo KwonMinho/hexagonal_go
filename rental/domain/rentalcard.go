@@ -4,12 +4,8 @@ import (
 	"errors"
 	"time"
 
+	"hexagonal_go/rental/domain/consts"
 	"hexagonal_go/rental/domain/vo"
-)
-
-const (
-	NotFoundRentalItem = -1
-	LateFeePointWeight = 10
 )
 
 type RentalCard struct {
@@ -40,7 +36,7 @@ func (r *RentalCard) removeRentalItem(rentalItem vo.RentalItem) error {
 	rmItem := rentalItem.Item
 
 	i := r.searchIndex(rmItem)
-	if i == NotFoundRentalItem {
+	if i == consts.NotFoundRentalItem {
 		return errors.New("삭제할 대여품목을 찾지 못했습니다.")
 	}
 	r.items = append(r.items[:i], r.items[i+1:]...)
@@ -69,7 +65,7 @@ func (r *RentalCard) searchIndex(item vo.Item) int {
 			return i
 		}
 	}
-	return NotFoundRentalItem
+	return consts.NotFoundRentalItem
 }
 
 func (r *RentalCard) RentItem(item vo.Item) error {
@@ -85,7 +81,7 @@ func (r *RentalCard) RentItem(item vo.Item) error {
 
 func (r *RentalCard) ReturnRentalItem(item vo.Item, returnDate time.Time) error {
 	i := r.searchIndex(item)
-	if i == NotFoundRentalItem {
+	if i == consts.NotFoundRentalItem {
 		return errors.New("반환할 대여품목을 찾지 못햇습니다.")
 	}
 
@@ -103,7 +99,7 @@ func (r *RentalCard) calculateLateFee(item vo.RentalItem, returnDate time.Time) 
 	itemReturnDate := item.GetReturnDate()
 	if returnDate.After(itemReturnDate) {
 		daysOverdue := int(returnDate.Sub(itemReturnDate).Hours() / 24)
-		points := daysOverdue * LateFeePointWeight
+		points := daysOverdue * consts.LateFeePointWeight
 		addPoint := r.lateFee.AddPoint(points)
 		r.lateFee = *addPoint
 	}
@@ -111,12 +107,12 @@ func (r *RentalCard) calculateLateFee(item vo.RentalItem, returnDate time.Time) 
 
 func (r *RentalCard) overdueItem(item vo.Item) error {
 	i := r.searchIndex(item)
-	if i == NotFoundRentalItem {
+	if i == consts.NotFoundRentalItem {
 		return errors.New("대여 품목을 찾지 못했습니다")
 	}
 
 	rentalItem := r.items[i]
-	rentalItem.Overdued = true
+	rentalItem.Overdue = true
 	r.status = vo.RentalNotAvailable
 	return nil
 }
